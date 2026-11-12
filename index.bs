@@ -2824,3 +2824,5 @@ for being awesome.
 
 <p>This standard is written by <a href=https://reilly.io lang=en>Reilly Grant</a>
 (<a href=https://www.google.com/>Google</a>, <a href=mailto:reillyg@google.com>reillyg@google.com</a>).
+
+<p boilerplate=ipr>This Living Standard was originally developed in the W3C WICG, where it was available under the <a href=https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document>W3C Software and Document License</a>.
