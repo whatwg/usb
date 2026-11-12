@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+    - main
+  push:
+    branches:
+    - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 2
+    - uses: actions/setup-python@v6
+      with:
+        python-version: "3.14"
+    - run: pip install bikeshed && bikeshed update
+    # Note: `make deploy` will do a deploy dry run on PRs.
+    - run: make deploy
+      env:
+        SERVER: ${{ secrets.MARQUEE_SERVER }}
+        SERVER_PUBLIC_KEY: ${{ secrets.MARQUEE_PUBLIC_KEY }}
+        SERVER_DEPLOY_KEY: ${{ secrets.MARQUEE_DEPLOY_KEY }}
