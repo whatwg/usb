@@ -1,54 +1,13 @@
 <pre class="metadata">
-Title: WebUSB API
-Status: w3c/CG-DRAFT
-ED: https://wicg.github.io/webusb
-Shortname: webusb
-Level: 1
-Editor: Reilly Grant 83788, Google LLC https://www.google.com, reillyg@google.com
-Editor: Ken Rockot 87080, Google LLC https://www.google.com, rockot@google.com
-Editor: Ovidio Ruiz-Henríquez 106543, Google LLC https://www.google.com, odejesush@google.com
+Group: WHATWG
+H1: WebUSB
+Shortname: usb
 Abstract: This document describes an API for securely providing access to Universal Serial Bus devices from web pages.
-Group: wicg
-Repository: https://github.com/WICG/webusb/
-!Participate: <a href="https://www.w3.org/community/wicg/">Join the W3C Community Group</a>
-!Participate: <a href="irc://irc.w3.org:6665/#webusb">IRC: #webusb on W3C's IRC</a> (Stay around for an answer, it make take a while)
-!Participate: <a href="http://stackoverflow.com/questions/tagged/webusb">Ask questions on StackOverflow</a>
 Markup Shorthands: css no, markdown yes
+Translation: zh-Hans https://htmlspecs.com/usb/
+Translation: ja https://jp.htmlspecs.com/usb/
+Translation: ko https://ko.htmlspecs.com/usb/
 </pre>
-
-<style>
-table {
-  border-collapse: collapse;
-  border-left-style: hidden;
-  border-right-style: hidden;
-  text-align: left;
-}
-table caption {
-  font-weight: bold;
-  padding: 3px;
-  text-align: left;
-}
-table td, table th {
-  border: 1px solid black;
-  padding: 3px;
-}
-
-/* Put nice boxes around each algorithm. */
-[data-algorithm]:not(.heading) {
-  padding: .5em;
-  border: thin solid #ddd; border-radius: .5em;
-  margin: .5em calc(-0.5em - 1px);
-}
-[data-algorithm]:not(.heading) > :first-child {
-  margin-top: 0;
-}
-[data-algorithm]:not(.heading) > :last-child {
-  margin-bottom: 0;
-}
-[data-algorithm] [data-algorithm] {
-    margin: 1em 0;
-}
-</style>
 
 # Introduction # {#introduction}
 
@@ -209,7 +168,7 @@ uploading a malicious firmware image) there is nothing that can be done by the
 UA to prevent further damage.
 
 This specification recommends device manufacturers practice defense in depth by
-designing their devices to only accept signed firmware updates and/or require
+designing their devices to only accept signed firmware updates or require
 physical access to the device in order to apply some configuration changes.
 
 # WebUSB Descriptors and Requests # {#webusb-descriptors-and-requests}
@@ -475,9 +434,9 @@ scheme, is encoded in the <code>URL</code> field.
   };
 </xmp>
 
-<div class="example">
+<div class="example" id="example-find-devices">
 In this example, we retrieve some devices to include in a UI. When the page is
-first loaded, it should check if it already has permission to access any
+first loaded, it can check if it already has permission to access any
 connected devices by calling {{USB/getDevices()}},
 
 <pre highlight="js">
@@ -489,8 +448,8 @@ connected devices by calling {{USB/getDevices()}},
   });
 </pre>
 
-After the page is loaded the user may <a>connect</a> or <a>disconnect</a> a
-device from their system so script should also register for these events in
+After the page is loaded the user might <a>connect</a> or <a>disconnect</a> a
+device from their system so script also registers for these events in
 order to keep the interface up-to-date,
 
 <pre highlight="js">
@@ -504,7 +463,7 @@ order to keep the interface up-to-date,
 </pre>
 
 If this is the first time the user has visited the page then it won't have
-permission to access any devices so the page must first call
+permission to access any devices so the page has to first call
 {{USB/requestDevice()}} while the [=relevant global object=] has a
 <a>transient activation</a>. In this case the page supports devices from vendor
 <code>0xABCD</code> that carry the vendor-specific subclass <code>0x01</code>,
@@ -788,7 +747,7 @@ interface USBConnectionEvent : Event {
 };
 </xmp>
 
-Note: Workers may register event listeners for <a>connect</a> and
+Note: Workers can register event listeners for <a>connect</a> and
 <a>disconnect</a> events but the event listener will not be invoked unless the
 worker is active.
 
@@ -803,7 +762,7 @@ MUST perform the following steps for each script execution environment:
   4. Let |deviceObj| be the {{USBDevice}} object representing |device|.
   5. [=Fire an event=] named <dfn>connect</dfn> on |device|'s [=relevant global
      object=]'s {{Navigator}} object's {{Navigator/usb}}, using
-     {{USBConnectionEvent}}, with the <code>device</code> attribute set to 
+     {{USBConnectionEvent}}, with the <code>device</code> attribute set to
      |deviceObj|.
 
 When the UA detects a <a>USB device</a> |device| has been disconnected from the
@@ -823,12 +782,12 @@ host it MUST perform the following steps for each script execution environment:
   5. Let |device| be the {{USBDevice}} object representing |device|.
   6. [=Fire an event=] named <dfn>disconnect</dfn> on |device|'s [=relevant
      global object=]'s {{Navigator}} object's {{Navigator/usb}}, using
-     {{USBConnectionEvent}}, with the <code>device</code> attribute set to 
+     {{USBConnectionEvent}}, with the <code>device</code> attribute set to
      |device|.
 
 # Device Usage # {#device-usage}
 
-<div class="example">
+<div class="example" id="example-device-usage">
 In this example we imagine a data logging device supporting up to 8 16-bit data
 channels. It has a single configuration (<code>bConfigurationValue 1</code>)
 with a single interface (<code>bInterfaceNumber 1</code>) with a single
@@ -840,7 +799,7 @@ combination of channels can be activated and deactivated. The packet will only
 be the length necessary to transmit the data collected.
 
 To get started we open the device, select the first configuration (it only has
-one but the operating system may not have already done this during enumeration)
+one but the operating system might not have already done this during enumeration)
 and claim the data logging interface,
 
 <pre highlight="js">
@@ -863,7 +822,7 @@ so we issue a <a>control transfer</a> to activate these channels,
   });
 </pre>
 
-The application may now start polling the device for data. As we only expect
+The application can now start polling the device for data. As we only expect
 data from 3 channels we request a 6 byte buffer. As long as we receive a
 complete buffer the captured values (transmitted in big endian) are printed to
 the console log. If the device has encountered an error and signals this by
@@ -1107,7 +1066,7 @@ given |interface| object, perform the following steps:
     To <dfn>find the current configuration</dfn> with the given |device| object,
     perform the following steps:
     1. <a>For each</a> |configuration| of |device|.{{USBDevice/[[configurations]]}}:
-        1. If |configuration|.{{USBConfiguration/[[configurationValue]]}} is equal to 
+        1. If |configuration|.{{USBConfiguration/[[configurationValue]]}} is equal to
             |device|.{{USBDevice/[[configurationValue]]}}, return |configuration|.
     1. Return <code>null</code>.
 </div>
@@ -1304,9 +1263,9 @@ following steps:
 1. <a>Remove |device| from storage</a> with |storage|.
 1. Return [=a promise resolved with=] `undefined`.
 
-Note: The user agent MAY decide to combine permissions across APIs, for instance
+Note: The user agent might decide to combine permissions across APIs, for instance
 tracking WebHID and WebUSB device access under a unified low-level device access
-permission. For this reason, this method may also revoke additional (unspecified
+permission. For this reason, this method might also revoke additional (unspecified
 yet) permissions in the future.
 </div>
 
@@ -1885,7 +1844,7 @@ given {{USBDevice}} |device|, {{USBControlTransferParameters}} |setup|, and
         The {{USBControlTransferParameters/value}} and
         {{USBControlTransferParameters/index}} attributes populate the
         <code>wValue</code> and <code>wIndex</code> fields of the <a>setup packet</a>
-        respectively. The meaning of these fields depends on the request being made.    
+        respectively. The meaning of these fields depends on the request being made.
 </dl>
 
 ## The USBConfiguration Interface ## {#usbconfiguration-interface}
@@ -1995,7 +1954,7 @@ slots</a> described in the following table:
     : <dfn>interfaces</dfn>
     ::
         The {{USBConfiguration/interfaces}} attribute SHALL contain a list of
-        interfaces exposed by this device configuration. 
+        interfaces exposed by this device configuration.
 
         The {{USBConfiguration/interfaces}} getter steps are:
           1. Return <a>this</a>.{{USBConfiguration/[[interfaces]]}}.
@@ -2042,7 +2001,7 @@ slots</a> described in the following table:
     <td>
       The interface number for this interface.
     </td>
-  </tr>  
+  </tr>
   <tr>
     <td><dfn>\[[alternates]]</dfn></td>
     <td>An empty <a>sequence</a> of {{USBAlternateInterface}}</td>
@@ -2056,7 +2015,7 @@ slots</a> described in the following table:
     <td>
       If this interface has any alternate setting belonging to a protected class.
     </td>
-  </tr>  
+  </tr>
 </table>
 
 An [=interface descriptor=] |interface| <dfn>has a protected interface class</dfn>
@@ -2138,9 +2097,9 @@ low level access through this API would.
             with |device|.{{USBDevice/[[selectedAlternateSetting]]}}[|interfaceIndex|] and |interface|.
     1. <a>Assert</a>: |alternateIndex| is not equal to <code>-1</code>.
     1. Return |interface|.{{USBInterface/alternates}}[|alternateIndex|].
-    
+
     Note: There is at least one alternate setting for an interface according to
-    <a>Interface Descriptor</a> [[!USB31]], as there must at least one alternate setting 
+    <a>Interface Descriptor</a> [[!USB31]], as there has to be at least one alternate setting
     in the <a>Interface Descriptor</a>.
 </div>
 
@@ -2162,7 +2121,7 @@ low level access through this API would.
             continue.
         1. If |descriptor| <a>has a protected interface class</a>,
             set <a>this</a>.{{USBInterface/[[isProtectedClass]]}} to <code>true</code>.
-        1. Let |alternate| be a <a>new</a> {{USBAlternateInterface}} object 
+        1. Let |alternate| be a <a>new</a> {{USBAlternateInterface}} object
             using <a>USBAlternateInterface(|deviceInterface|,|alternateSetting|)</a> with
             |deviceInterface| set to <a>this</a> and
             |alternateSetting| set to the <code>bAlternateSetting</code> of the |descriptor|.
@@ -2181,7 +2140,7 @@ low level access through this API would.
 
         The {{USBInterface/interfaceNumber}} getter steps are:.
           1. Return <a>this</a>.{{USBInterface/[[interfaceNumber]]}}.
-    
+
     : <dfn>alternate</dfn>
     ::
         The {{USBInterface/alternate}} attribute SHALL be set to the
@@ -2303,7 +2262,7 @@ slots</a> described in the following table:
         and <code>configurationValue</code> set to
         |deviceInterface|.{{USBInterface/[[configuration]]}}.{{USBConfiguration/[[configurationValue]]}}.
     1. <a>For each</a> |descriptor| of |descriptors|:
-        1. If <code>bmAttributes</code> of |descriptor| indicates it is a 
+        1. If <code>bmAttributes</code> of |descriptor| indicates it is a
             Control Transfer Type (i.e. bits <code>0..1</code> is <code>00</code>
             according to <a>endpoint descriptor</a>), continue.
         1. Let |endpointAddress| be <code>bEndpointAddress</code> of |descriptor|.
@@ -2326,7 +2285,7 @@ slots</a> described in the following table:
         {{USBAlternateInterface/alternateSetting}} within a given interface that
         matches the <code>bAlternateSetting</code> field of the <a>interface
         descriptor</a> that defines it.
-    
+
     : <dfn>interfaceClass</dfn>
     : <dfn>interfaceSubclass</dfn>
     : <dfn>interfaceProtocol</dfn>
@@ -2401,7 +2360,7 @@ slots</a> described in the following table:
     <td>
       The {{USBAlternateInterface}} object <a>this</a> belongs to.
     </td>
-  </tr>  
+  </tr>
   <tr>
     <td><dfn>\[[endpointAddress]]</dfn></td>
     <td>&lt;always set in prose></td>
@@ -2499,7 +2458,7 @@ slots</a> described in the following table:
   };
 </xmp>
 
-This specification relies on a <a href="https://raw.githubusercontent.com/WICG/webusb/main/blocklist.txt">blocklist.txt</a>
+This specification relies on a <a href="https://raw.githubusercontent.com/whatwg/usb/main/blocklist.txt">blocklist.txt</a>
 file in this repository to restrict the set of devices a website can access.
 
 The result of <dfn>parsing the blocklist</dfn> at a {{URL}} |url| is a [=list=]
@@ -2531,7 +2490,7 @@ of {{USBBlocklistEntry}} objects produced by the following algorithm:
   1. Return |blocklist|.
 
 The <dfn>USB blocklist</dfn> is the result of [=parsing the blocklist=] at
-<a href="https://raw.githubusercontent.com/WICG/webusb/main/blocklist.txt">https://raw.githubusercontent.com/WICG/webusb/main/blocklist.txt</a>.
+<a href="https://raw.githubusercontent.com/whatwg/usb/main/blocklist.txt">https://raw.githubusercontent.com/whatwg/usb/main/blocklist.txt</a>.
 The UA should re-fetch the blocklist periodically, but it’s unspecified how
 often.
 
@@ -2741,7 +2700,7 @@ acknowledged or a failure is signaled.
 <em>This section is non-normative</em>.
 
 USB is a network but it's very different from traditional TCP/IP networks. It is
-really more like an RPC system. All traffic is directed by the host, that is,
+really more like a remote procedure call (RPC) system. All traffic is directed by the host, that is,
 your computer. Though some devices like smartphones can act as both a USB host
 and USB client they can only take on one role at a time.
 
@@ -2809,7 +2768,7 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
         text: Promise; url:sec-promise-objects
         text: TypeError; url: sec-native-error-types-used-in-this-standard-typeerror
     type: dfn
-        text: internal slot; url: sec-object-internal-methods-and-internal-slots        
+        text: internal slot; url: sec-object-internal-methods-and-internal-slots
 </pre>
 
 <pre class="link-defaults">
@@ -2828,5 +2787,40 @@ spec:infra; type:dfn; for:list; text:for each
 spec:infra; type:dfn; for:list; text:append
 spec:infra; type:dfn; for:list; text:empty
 spec:infra; type:dfn; for:list; text:size
+spec:permissions; type:enum-value; text:prompt
 spec:url; type:interface; text:URL
 </pre>
+
+<h2 id=acknowledgments class=no-num>Acknowledgments</h2>
+
+<p>Thanks to
+Alvin Ji<!-- alvinjiooo; GitHub -->,
+Balazs Kelemen<!-- balazskelemen99; GitHub -->,
+Daniel Gredler<!-- gredler; GitHub -->,
+David Sanders<!-- dsanders11; GitHub -->,
+Divy Srivastava<!-- littledivy; GitHub -->,
+Domenico Andreoli<!-- cavokz; GitHub -->,
+Dominique Hazael-Massieux<!-- dontcallmedom; GitHub -->,
+François Beaufort<!-- beaufortfrancois; GitHub -->,
+fvibert<!-- fvibert; GitHub -->,
+Ian Clelland<!-- clelland; GitHub -->,
+Ingvar Stepanyan<!-- RReverser; GitHub -->,
+Jack Hsieh<!-- chengweih001; GitHub -->,
+Kagami Sascha Rosylight<!-- autokagami; GitHub -->,
+Ken Rockot<!-- krockot; GitHub -->,
+Marcos Cáceres<!-- marcoscaceres; GitHub -->,
+Martino Facchin<!-- facchinm; GitHub -->,
+Matt Reynolds<!-- nondebug; GitHub -->,
+Ovidio Ruiz-Henríquez<!-- odejesush; GitHub -->,
+Peter Snyder<!-- pes10k; GitHub -->,
+Philip Jägenstedt<!-- foolip; GitHub -->,
+Rob Moran<!-- thegecko; GitHub -->,
+Sam Saccone<!-- samccone; GitHub -->,
+Tim Steiner<!-- onlykey; GitHub -->,
+Travis Leithead<!-- travisleithead; GitHub -->,
+Vincent Scheib<!-- scheib; GitHub -->, and
+Yoav Weiss<!-- yoavweiss; GitHub -->
+for being awesome.
+
+<p>This standard is written by <a href=https://reilly.io lang=en>Reilly Grant</a>
+(<a href=https://www.google.com/>Google</a>, <a href=mailto:reillyg@google.com>reillyg@google.com</a>).
